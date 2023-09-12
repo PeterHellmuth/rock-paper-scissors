@@ -9,69 +9,51 @@ function getComputerChoice(){
     }
 }
 
-function playRound(playerSelection, computerSelection){
-    playerSelection = playerSelection.toLowerCase();
+function playRound(event){
+    let playerSelection = event.target.id;
+    let playerWon = false;
+    let computerSelection = getComputerChoice();
 
-    if (playerSelection == computerSelection){
-        return -1;
-    } else if (playerSelection == "rock"){
-        if(computerSelection == "paper"){
-            return 0;
-        } else {
-            return 1;
+    if(!gameOver){
+        if (playerSelection != computerSelection){
+            if (playerSelection == "rock"){
+                if(computerSelection != "paper"){
+                    playerWon = true;
+                }
+            } else if (playerSelection == "paper"){
+                if(computerSelection != "scissors"){
+                    playerWon = true;
+                } 
+            } else { //scissors
+                if(computerSelection != "rock"){
+                    playerWon = true;
+                }
+            }
         }
-    } else if (playerSelection == "paper"){
-        if(computerSelection == "rock"){
-            return 1;
-        } else {
-            return 0;
-        }
-    } else{
-        if(computerSelection == "rock"){
-            return 0;
-        } else {
-            return 1;
-        }
-    }
-}
-
-function game(){
-    let playerScore = 0;
-    let nextPrompt="";
-    for(i = 0; i < 5; i++){
-
-        let playerChoice = prompt(nextPrompt + "\nrock/paper/scissors, your choice, your opponent is the computer. This is round " + (i+1) + " out of 5.").toLowerCase();
-        nextPrompt ="";
-        let computerChoice = getComputerChoice();
-        if(playerChoice != "rock" && playerChoice != "paper" && playerChoice != "scissors"){
-            playerChoice = "rock";
-            nextPrompt += "You didn't pick one of the options so I picked rock for you. Everyone picks rock.\n";
-        }
-
-        let result = playRound(playerChoice, computerChoice);
-        if (result == -1){
-            i--;
+        if(playerWon){
+            playerWins++;
         } else{
-            playerScore+= result;
-
+            computerWins++;
         }
-
-        nextPrompt += calcResultText(playerChoice, computerChoice);
-
-        nextPrompt += "\nThe score is now you: "+ playerScore + " to the computer: " + (i+1-playerScore);
     }
 
-    nextPrompt =  "The FINAL score is you: " + playerScore + " to computer: " + (5-playerScore);
-    if(playerScore >= 3){
-        nextPrompt += "\nCongratulations you beat the computer in this random game of chance.";
-    } else {
-        nextPrompt += "\nThe computer won this random game of chance. Surely it wasn't rigged...";
+
+    if(playerWins >= 3){
+        outputDiv.innerText = "You won 3 out of 5! You beat the mindless random computer in a game of chance!"
+        outputDiv.innerText += `\nThe final score was: \nYou: ${playerWins} Computer: ${computerWins}`
+        gameOver = true;
+    } else if(computerWins >= 3){
+        outputDiv.innerText = "You lost 3 out of 5! You lost to the mindless random computer in a game of chance!"
+        outputDiv.innerText += `\nThe final score was: \nYou: ${playerWins} Computer: ${computerWins}`
+        gameOver = true;
+    } else{
+        outputDiv.innerText = calcResultText(playerSelection, computerSelection);
+        outputDiv.innerText += "\n"
+        outputDiv.innerText += `The current score is: \nYou: ${playerWins} Computer: ${computerWins}`
     }
-    nextPrompt +="\nDo you want to play again?";
-    if(confirm(nextPrompt)){
-        game();
-    }
+
 }
+
 
 
 function calcResultText(playerChoice, computerChoice){
@@ -97,4 +79,15 @@ function calcResultText(playerChoice, computerChoice){
         }
     }
 }
-game();
+
+
+
+
+document.getElementById("rock").addEventListener("click", playRound);
+document.getElementById("paper").addEventListener("click", playRound);
+document.getElementById("scissors").addEventListener("click", playRound);
+
+let outputDiv = document.getElementById("Result");
+let playerWins = 0;
+let computerWins = 0;
+let gameOver = false;
